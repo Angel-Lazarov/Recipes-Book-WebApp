@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>📖 Моите рецепти</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>📖 Моите рецепти!</h1>
+
+    <!-- Бутон за показване на формата -->
+    <button id="showFormBtn">➕ Добави нова рецепта</button>
+
+    <!-- Форма за добавяне -->
+    <form id="recipeForm">
+        <label for="title">Име на рецепта</label>
+        <input type="text" id="title" placeholder="Име на рецепта" required>
+
+        <label for="category">Категория</label>
+        <input type="text" id="category" placeholder="Категория (супа, десерт…)" required>
+
+        <label for="ingredients">Съставки</label>
+        <textarea id="ingredients" placeholder="Съставки (разделени със запетаи)" required></textarea>
+
+        <label for="steps">Стъпки</label>
+        <textarea id="steps" placeholder="Стъпки" required></textarea>
+
+        <label for="image">Снимка</label>
+        <input type="file" id="image">
+
+        <img id="previewImage" src="" alt="Стара снимка" style="max-width:150px; display:none; margin-top:10px;">
+
+        <button type="submit">Добави рецепта</button>
+    </form>
+
+    <!-- Търсене и филтри -->
+    <div class="search-container">
+        <input type="text" id="search" placeholder="Търси по съставка или име">
+        <span class="clear-btn" id="clearSearch">×</span>
+    </div>
+    <div class="filter-container">
+        <select id="filterCategory">
+            <option value="">Всички категории</option>
+        </select>
+    </div>
+
+    <!-- Списък с рецепти -->
+    <div id="recipeList"></div>
+
+    <!-- Зареждане на скрипт като module -->
+    <script src="script.js"></script>
+</body>
+</html>
