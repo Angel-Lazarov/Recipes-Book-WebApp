@@ -1,4 +1,6 @@
-const defaultImage = "default.png"; // дефолтна снимка
+import { addRecipe, getAllRecipes, updateRecipe, deleteRecipeById } from './firestore.js';
+
+const defaultImage = "default.png";
 const form = document.getElementById('recipeForm');
 const recipeList = document.getElementById('recipeList');
 const search = document.getElementById('search');
@@ -7,56 +9,15 @@ const previewImage = document.getElementById("previewImage");
 const showFormBtn = document.getElementById("showFormBtn");
 const clearSearch = document.getElementById("clearSearch");
 
-const STORAGE_KEY = "recipes";
-
-// ================= LocalStorage функции =================
-function saveRecipesToStorage(recipes) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
-}
-
-function getRecipesFromStorage() {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-}
-
-async function addRecipeLS(recipe) {
-    const recipes = getRecipesFromStorage();
-    recipe.id = Date.now().toString();
-    recipes.push(recipe);
-    saveRecipesToStorage(recipes);
-}
-
-async function updateRecipeLS(id, updatedData) {
-    const recipes = getRecipesFromStorage();
-    const index = recipes.findIndex(r => r.id === id);
-    if (index !== -1) {
-        recipes[index] = { id, ...updatedData };
-        saveRecipesToStorage(recipes);
-    }
-}
-
-async function deleteRecipeLS(id) {
-    const recipes = getRecipesFromStorage().filter(r => r.id !== id);
-    saveRecipesToStorage(recipes);
-}
-
-async function getAllRecipesLS() {
-    return getRecipesFromStorage();
-}
-
-// ======================================================
-
 // Показване/скриване на формата
-showFormBtn.addEventListener("click", () => {
-    form.classList.toggle("show");
-});
+showFormBtn.addEventListener("click", () => form.classList.toggle("show"));
 
-// Зареждане на всички рецепти
+// Зареждане на всички рецепти от Firestore
 async function loadAllRecipes() {
-    const allRecipes = await getAllRecipesLS();
+    const allRecipes = await getAllRecipes();
 
     const q = (search.value || "").toLowerCase();
     const filtered = allRecipes.filter(r => {
-        // Гарантираме, че ingredients и steps са масиви
         const ingredientsArr = Array.isArray(r.ingredients) ? r.ingredients : String(r.ingredients).split(",").map(i => i.trim());
         const stepsArr = Array.isArray(r.steps) ? r.steps : String(r.steps).split(".").map(s => s.trim());
 
@@ -74,13 +35,12 @@ async function loadAllRecipes() {
 
         const div = document.createElement("div");
         div.className = "recipe";
-        const imgHtml = `<img src="${r.image || defaultImage}" alt="${r.title}">`;
         div.innerHTML = `
             <h3>${r.title}</h3>
             <p><b>Категория:</b> ${r.category}</p>
             <p><b>Съставки:</b> ${ingredientsArr.join(", ")}</p>
             <p><b>Стъпки:</b> ${stepsArr.join(". ")}</p>
-            ${imgHtml}
+            <img src="${r.image || defaultImage}" alt="${r.title}">
             <button onclick="handleDelete('${r.id}')">❌ Изтрий</button>
             <button onclick="handleEdit('${r.id}')">✏️ Редактирай</button>
         `;
@@ -104,13 +64,13 @@ function updateCategories(recipes) {
 
 // Функция за изтриване на рецепта
 window.handleDelete = async (id) => {
-    await deleteRecipeLS(id);
+    await deleteRecipeById(id);
     await loadAllRecipes();
 };
 
 // Функция за редакция на рецепта
 window.handleEdit = async (id) => {
-    const allRecipes = await getAllRecipesLS();
+    const allRecipes = await getAllRecipes();
     const recipe = allRecipes.find(r => r.id === id);
     if (!recipe) return;
 
@@ -123,15 +83,14 @@ window.handleEdit = async (id) => {
     form.dataset.editingImage = recipe.image || defaultImage;
     previewImage.src = recipe.image || defaultImage;
     previewImage.style.display = "block";
-
     form.classList.add("show");
 };
 
 // Обработка на формата
 form.addEventListener("submit", async function(e) {
     e.preventDefault();
-    const reader = new FileReader();
     const file = document.getElementById("image")?.files?.[0];
+    const reader = new FileReader();
 
     reader.onloadend = async function () {
         const existingImage = form.dataset.editingImage || defaultImage;
@@ -144,10 +103,10 @@ form.addEventListener("submit", async function(e) {
         };
 
         if (form.dataset.editingId) {
-            await updateRecipeLS(form.dataset.editingId, recipeData);
+            await updateRecipe(form.dataset.editingId, recipeData);
             delete form.dataset.editingId;
         } else {
-            await addRecipeLS(recipeData);
+            await addRecipe(recipeData);
         }
 
         form.reset();
