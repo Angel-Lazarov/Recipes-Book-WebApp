@@ -135,5 +135,5 @@ search.addEventListener("input", () => {
     clearSearch.style.display = search.value ? "block" : "none";
 });
 
-// Първоначално зареждане на категории и рецепти
+// Първоначално зареждане на категории и рецепти.
 initializeCategories().then(loadAllRecipes);
