@@ -12,19 +12,20 @@ const clearSearch = document.getElementById("clearSearch");
 // Показване/скриване на формата
 showFormBtn.addEventListener("click", () => form.classList.toggle("show"));
 
-// Зареждане на всички рецепти от Firestore
+// Филтриране и зареждане на рецепти
 async function loadAllRecipes() {
     const allRecipes = await getAllRecipes();
-
     const q = (search.value || "").toLowerCase();
+    const selectedCategory = filterCategory.value;
+
     const filtered = allRecipes.filter(r => {
         const ingredientsArr = Array.isArray(r.ingredients) ? r.ingredients : String(r.ingredients).split(",").map(i => i.trim());
-        const stepsArr = Array.isArray(r.steps) ? r.steps : String(r.steps).split(".").map(s => s.trim());
-
         const title = (r.title || "").toLowerCase();
         const ingredients = ingredientsArr.join(", ").toLowerCase();
+
         const matchesSearch = title.includes(q) || ingredients.includes(q);
-        const matchesCategory = !filterCategory || filterCategory.value === "" || r.category === filterCategory.value;
+        const matchesCategory = !selectedCategory || selectedCategory === "" || r.category === selectedCategory;
+
         return matchesSearch && matchesCategory;
     });
 
@@ -46,13 +47,13 @@ async function loadAllRecipes() {
         `;
         recipeList.appendChild(div);
     });
-
-    updateCategories(filtered);
 }
 
-// Обновяване на списъка с категории
-function updateCategories(recipes) {
-    const cats = [...new Set((recipes || []).map(r => r.category || "").filter(Boolean))];
+// Зареждане и попълване на категориите само веднъж
+async function initializeCategories() {
+    const allRecipes = await getAllRecipes();
+    const cats = [...new Set(allRecipes.map(r => r.category || "").filter(Boolean))];
+
     filterCategory.innerHTML = `<option value="">Всички категории</option>`;
     cats.forEach(c => {
         const opt = document.createElement("option");
@@ -134,5 +135,5 @@ search.addEventListener("input", () => {
     clearSearch.style.display = search.value ? "block" : "none";
 });
 
-// Първоначално зареждане на рецепти
-loadAllRecipes();
+// Първоначално зареждане на категории и рецепти
+initializeCategories().then(loadAllRecipes);
