@@ -20,5 +20,4 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_RECIPESBOOK_DD53E }}
           channelId: live
           projectId: recipesbook-dd53e
-        env:
-          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          entryPoint: front-end
