@@ -21,3 +21,4 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_RECIPESBOOK_DD53E }}
           projectId: recipesbook-dd53e
+          entryPoint: front-end

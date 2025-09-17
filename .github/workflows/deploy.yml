@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Клонираме кода
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Инсталираме Node.js и зависимостите в server
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -24,12 +22,10 @@ jobs:
         working-directory: server
         run: npm install
 
-      # 3. Стартираме тестове (опционално)
       #- name: Run tests
       #  working-directory: server
       #  run: npm test
 
-      # 4. Деплой към Render без проверка на HTTP код
       - name: Deploy to Render
         working-directory: server
         env:
