@@ -12,9 +12,10 @@ import {
   deleteDoc 
 } from "https://www.gstatic.com/firebasejs/9.6.5/firebase-firestore.js";
 
-// Конфигурация на Firebase (замени с твоята)
+// Конфигурация на Firebase
+// apiKey се подава чрез GitHub Secret
 const firebaseConfig = {
-  apiKey: "AIzaSyDTqQ-hjgsfgZaXrZacr3Bk5nqyWyQASo0",
+  apiKey: FIREBASE_API_KEY, // <- тук използваме secret ключа
   authDomain: "recipesbook-dd53e.firebaseapp.com",
   projectId: "recipesbook-dd53e",
   storageBucket: "recipesbook-dd53e.firebasestorage.app",
