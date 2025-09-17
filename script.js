@@ -90,35 +90,52 @@ window.handleEdit = async (id) => {
 form.addEventListener("submit", async function(e) {
     e.preventDefault();
     const file = document.getElementById("image")?.files?.[0];
-    const reader = new FileReader();
 
-    reader.onloadend = async function () {
-        const existingImage = form.dataset.editingImage || defaultImage;
-        const recipeData = {
-            title: document.getElementById("title").value,
-            category: document.getElementById("category").value,
-            ingredients: document.getElementById("ingredients").value.split(",").map(i => i.trim()),
-            steps: document.getElementById("steps").value.split(".").map(s => s.trim()),
-            image: file ? reader.result : existingImage
-        };
+    let imageUrl = form.dataset.editingImage || defaultImage;
 
-        if (form.dataset.editingId) {
-            await updateRecipe(form.dataset.editingId, recipeData);
-            delete form.dataset.editingId;
-        } else {
-            await addRecipe(recipeData);
+    // Ако има файл, качваме на Node.js сървъра
+    if (file) {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        try {
+            const response = await fetch("https://<your-server-url>/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) throw new Error("Грешка при качване на изображението");
+
+            const data = await response.json();
+            imageUrl = data.url; // URL от Node.js сървъра
+        } catch (err) {
+            console.error(err);
+            alert("Качването на изображението неуспя!");
+            return;
         }
+    }
 
-        form.reset();
-        previewImage.src = "";
-        previewImage.style.display = "none";
-        delete form.dataset.editingImage;
-        form.classList.remove("show");
-        await loadAllRecipes();
+    const recipeData = {
+        title: document.getElementById("title").value,
+        category: document.getElementById("category").value,
+        ingredients: document.getElementById("ingredients").value.split(",").map(i => i.trim()),
+        steps: document.getElementById("steps").value.split(".").map(s => s.trim()),
+        image: imageUrl
     };
 
-    if (file) reader.readAsDataURL(file);
-    else reader.onloadend();
+    if (form.dataset.editingId) {
+        await updateRecipe(form.dataset.editingId, recipeData);
+        delete form.dataset.editingId;
+    } else {
+        await addRecipe(recipeData);
+    }
+
+    form.reset();
+    previewImage.src = "";
+    previewImage.style.display = "none";
+    delete form.dataset.editingImage;
+    form.classList.remove("show");
+    await loadAllRecipes();
 });
 
 // Филтриране и търсене
