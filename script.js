@@ -108,7 +108,7 @@ form.addEventListener("submit", async function(e) {
             if (!response.ok) throw new Error("Грешка при качване на изображението");
 
             const data = await response.json();
-            imageUrl = data.url; // URL от Node.js сървъра
+            imageUrl = data.url; // взимаме URL от сървъра
         } catch (err) {
             console.error(err);
             alert("Качването на изображението неуспя!");
@@ -121,7 +121,7 @@ form.addEventListener("submit", async function(e) {
         category: document.getElementById("category").value,
         ingredients: document.getElementById("ingredients").value.split(",").map(i => i.trim()),
         steps: document.getElementById("steps").value.split(".").map(s => s.trim()),
-        image: imageUrl
+        image: imageUrl // вече само URL, без Base64
     };
 
     if (form.dataset.editingId) {
