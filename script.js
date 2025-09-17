@@ -81,7 +81,7 @@ window.handleEdit = async (id) => {
     document.getElementById("steps").value = (Array.isArray(recipe.steps) ? recipe.steps : String(recipe.steps).split(".").map(s => s.trim())).join(". ");
 
     form.dataset.editingId = recipe.id;
-    previewImage.src = recipe.image || defaultImage;
+    previewImage.src = recipe.image || defaultImage; // винаги URL
     previewImage.style.display = recipe.image ? "block" : "none";
     form.classList.add("show");
 };
@@ -91,8 +91,14 @@ form.addEventListener("submit", async function(e) {
     e.preventDefault();
     const file = document.getElementById("image")?.files?.[0];
 
-    let imageUrl = previewImage.src || defaultImage;
+    let imageUrl = defaultImage;
+    if (form.dataset.editingId) {
+        const allRecipes = await getAllRecipes();
+        const recipe = allRecipes.find(r => r.id === form.dataset.editingId);
+        if (recipe && recipe.image) imageUrl = recipe.image; // запазваме съществуващ URL
+    }
 
+    // Ако има нов файл, качваме на сървъра
     if (file) {
         const formData = new FormData();
         formData.append("image", file);
@@ -106,7 +112,7 @@ form.addEventListener("submit", async function(e) {
             if (!response.ok) throw new Error("Грешка при качване на изображението");
 
             const data = await response.json();
-            imageUrl = data.url;
+            imageUrl = data.url; // URL от Node.js сървъра
         } catch (err) {
             console.error(err);
             alert("Качването на изображението неуспя!");
