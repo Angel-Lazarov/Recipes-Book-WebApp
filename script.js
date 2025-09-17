@@ -94,7 +94,7 @@ form.addEventListener("submit", async function(e) {
 
     let imageUrl = form.dataset.editingImage || defaultImage;
 
-    // Ако има нов файл, качваме само на Node.js сървъра
+    // Ако има нов файл, качваме на Node.js сървъра
     if (file) {
         const formData = new FormData();
         formData.append("image", file);
