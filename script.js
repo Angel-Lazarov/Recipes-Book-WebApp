@@ -100,7 +100,7 @@ form.addEventListener("submit", async function(e) {
         formData.append("image", file);
 
         try {
-            const response = await fetch("https://<your-server-url>/upload", {
+            const response = await fetch("https://recipes-upload-server.onrender.com/upload", {
                 method: "POST",
                 body: formData
             });
