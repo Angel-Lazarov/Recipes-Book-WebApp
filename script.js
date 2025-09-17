@@ -81,8 +81,9 @@ window.handleEdit = async (id) => {
     document.getElementById("steps").value = (Array.isArray(recipe.steps) ? recipe.steps : String(recipe.steps).split(".").map(s => s.trim())).join(". ");
 
     form.dataset.editingId = recipe.id;
-    previewImage.src = recipe.image || defaultImage; // винаги URL
-    previewImage.style.display = recipe.image ? "block" : "none";
+    form.dataset.editingImage = recipe.image || defaultImage;
+    previewImage.src = recipe.image || defaultImage;
+    previewImage.style.display = "block";
     form.classList.add("show");
 };
 
@@ -91,14 +92,9 @@ form.addEventListener("submit", async function(e) {
     e.preventDefault();
     const file = document.getElementById("image")?.files?.[0];
 
-    let imageUrl = defaultImage;
-    if (form.dataset.editingId) {
-        const allRecipes = await getAllRecipes();
-        const recipe = allRecipes.find(r => r.id === form.dataset.editingId);
-        if (recipe && recipe.image) imageUrl = recipe.image; // запазваме съществуващ URL
-    }
+    let imageUrl = form.dataset.editingImage || defaultImage;
 
-    // Ако има нов файл, качваме на сървъра
+    // Ако има нов файл, качваме само на Node.js сървъра
     if (file) {
         const formData = new FormData();
         formData.append("image", file);
@@ -138,6 +134,7 @@ form.addEventListener("submit", async function(e) {
     form.reset();
     previewImage.src = "";
     previewImage.style.display = "none";
+    delete form.dataset.editingImage;
     form.classList.remove("show");
     await loadAllRecipes();
 });
