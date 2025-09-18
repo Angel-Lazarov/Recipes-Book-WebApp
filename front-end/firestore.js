@@ -13,9 +13,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.6.5/firebase-firestore.js";
 
 // Конфигурация на Firebase
-// apiKey се подава чрез GitHub Secret
 const firebaseConfig = {
-  apiKey: FIREBASE_API_KEY, // <- тук използваме secret ключа
+  apiKey: "AIzaSyDTqQ-hjgsfgZaXrZacr3Bk5nqyWyQASo0", // <- директно API key
   authDomain: "recipesbook-dd53e.firebaseapp.com",
   projectId: "recipesbook-dd53e",
   storageBucket: "recipesbook-dd53e.firebasestorage.app",
